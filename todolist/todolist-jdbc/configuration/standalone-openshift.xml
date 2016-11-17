@@ -142,7 +142,7 @@
                 <datasource jndi-name="java:jboss/jdbc/TodoListDS"
                                 pool-name="mariadbpool" enabled="true" use-java-context="true">
                     <connection-url>jdbc:mariadb:failover://mariadb-ha-1.mariadb-ha.mariadb-ha.svc.cluster.local,mariadb-ha-2.mariadb-ha.mariadb-ha.svc.cluster.local,mariadb-ha-0.mariadb-ha.mariadb-ha.svc.cluster.local/mydb</connection-url>
-                    <driver>mysql</driver>
+                    <driver>maria</driver>
                     <security>
                         <user-name>admin</user-name>
                         <password>admin</password>
@@ -155,6 +155,9 @@
                     <driver name="mysql" module="com.mysql">
                         <xa-datasource-class>com.mysql.jdbc.jdbc2.optional.MysqlXADataSource</xa-datasource-class>
                     </driver>
+                    <driver name="maria" module="com.mariadb">
+                        <xa-datasource-class>org.mariadb.jdbc.MySQLXAResource</xa-datasource-class>
+                    </driver>                    
                     <driver name="postgresql" module="org.postgresql">
                         <xa-datasource-class>org.postgresql.xa.PGXADataSource</xa-datasource-class>
                     </driver>
