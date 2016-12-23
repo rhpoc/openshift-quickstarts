@@ -35,8 +35,7 @@
     </licenses>
 
     <properties>
-        <!-- Explicitly declaring the source encoding eliminates the following 
-            message: -->
+        <!-- Explicitly declaring the source encoding eliminates the following message: -->
         <!-- [WARNING] Using platform encoding (UTF-8 actually) to copy filtered 
             resources, i.e. build is platform dependent! -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -53,6 +52,7 @@
         <maven.compiler.source>1.6</maven.compiler.source>
 
         <jboss-servlet-api_3.0_spec.version>1.0.0.Final</jboss-servlet-api_3.0_spec.version>
+        <skipTests>false</skipTests>
     </properties>
 
 
@@ -60,12 +60,21 @@
     </dependencyManagement>
 
     <dependencies>
+    
         <dependency>
             <groupId>org.jboss.spec.javax.servlet</groupId>
             <artifactId>jboss-servlet-api_3.0_spec</artifactId>
             <version>${jboss-servlet-api_3.0_spec.version}</version>
             <scope>provided</scope>
         </dependency>
+        
+        <dependency>
+		  <groupId>junit</groupId>
+		  <artifactId>junit</artifactId>
+		  <version>4.11</version>
+		  <scope>test</scope>
+		</dependency>
+		
     </dependencies>
 
     <build>
@@ -93,10 +102,8 @@
 
     <profiles>
         <profile>
-            <!-- The default profile skips all tests, though you can tune it to run 
-                just unit tests based on a custom pattern -->
-            <!-- Seperate profiles are provided for running all tests, including Arquillian 
-                tests that execute in the specified container -->
+            <!-- The default profile skips all tests, though you can tune it to run just unit tests based on a custom pattern -->
+            <!-- Seperate profiles are provided for running all tests, including Arquillian tests that execute in the specified container -->
             <id>default</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
@@ -107,7 +114,7 @@
                         <artifactId>maven-surefire-plugin</artifactId>
                         <version>${version.surefire.plugin}</version>
                         <configuration>
-                            <skip>true</skip>
+                            <skip>false</skip>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -115,12 +122,9 @@
         </profile>
 
         <profile>
-            <!-- When built in OpenShift the 'openshift' profile will be used when 
-                invoking mvn. -->
-            <!-- Use this profile for any OpenShift specific customization your app 
-                will need. -->
-            <!-- By default that is to put the resulting archive into the 'deployments' 
-                folder. -->
+            <!-- When built in OpenShift the 'openshift' profile will be used when invoking mvn. -->
+            <!-- Use this profile for any OpenShift specific customization your app will need. -->
+            <!-- By default that is to put the resulting archive into the 'deployments' folder. -->
             <!-- http://maven.apache.org/guides/mini/guide-building-for-different-environments.html -->
             <id>openshift</id>
             <build>
