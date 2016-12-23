@@ -3,7 +3,8 @@
   xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 
   https://maven.apache.org/xsd/settings-1.0.0.xsd">
   
-  <server>
+  <servers>
+    <server>
       <id>nexus</id>
       <username>admin</username>
       <password>admin123</password>
