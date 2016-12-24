@@ -141,7 +141,8 @@
                 <!-- ##DATASOURCES## -->
                 <datasource jndi-name="java:jboss/jdbc/TodoListDS"
                                 pool-name="mariadbpool" enabled="true" use-java-context="true">
-                    <connection-url>jdbc:mariadb:failover://mariadb-ha-0.mariadb-ha.mariadb-ha.svc.cluster.local,mariadb-ha-1.mariadb-ha.mariadb-ha.svc.cluster.local,mariadb-ha-2.mariadb-ha.mariadb-ha.svc.cluster.local/mydb</connection-url>
+                    <!-- <connection-url>jdbc:mariadb:failover://mariadb-ha-0.mariadb-ha.mariadb-ha.svc.cluster.local,mariadb-ha-1.mariadb-ha.mariadb-ha.svc.cluster.local,mariadb-ha-2.mariadb-ha.mariadb-ha.svc.cluster.local/mydb</connection-url> -->
+                    <connection-url>jdbc:mariadb:failover://mariadb-ha-0.mariadb-ha.mariadb-ha.svc.cluster.local</connection-url>
                     <driver>maria</driver>
                     <security>
                         <user-name>admin</user-name>
