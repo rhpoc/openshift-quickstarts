@@ -7,6 +7,8 @@ import javax.naming.InitialContext;
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
+
+import java.io.Serializable;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,9 +30,13 @@ public class JdbcTodoListDAO implements TodoListDAO {
     private DataSource lookupDataSource() {
         try {
             Context initialContext = new InitialContext();
+            String mydb = null;
             try {
-                return (DataSource) initialContext.lookup(System.getenv("MYDB"));
+            	mydb = "java:jboss/jdbc/TodoListDS"; // System.getenv("MYDB");
+            	System.out.println( "mydb: " +  mydb);
+                return (DataSource) initialContext.lookup(mydb);
             } catch (NameNotFoundException e) {
+            	System.out.println( "mydb: " +  mydb);
                 Context envContext = (Context) initialContext.lookup("java:comp/env");  // Tomcat places datasources inside java:comp/env
                 return (DataSource) envContext.lookup(System.getenv("MYDB"));
             }
@@ -44,10 +50,11 @@ public class JdbcTodoListDAO implements TodoListDAO {
             Connection connection = getConnection();
             try {
                 if (!isSchemaInitialized(connection)) {
-                    connection.setAutoCommit(true);
+                    connection.setAutoCommit(false);
                     Statement statement = connection.createStatement();
                     try {
                         statement.executeUpdate("CREATE TABLE todo_entries (id bigint, summary VARCHAR(255), description TEXT)");
+                        connection.commit();
                     } finally {
                         statement.close();
                     }
@@ -70,17 +77,22 @@ public class JdbcTodoListDAO implements TodoListDAO {
     }
 
     @Override
-    public void save(TodoEntry entry) {
+    public long save(TodoEntry entry) {
+    	Long id = (Long) entry.getId();
         try {
             Connection connection = getConnection();
             try {
-                connection.setAutoCommit(true);
+                connection.setAutoCommit(false);
                 PreparedStatement statement = connection.prepareStatement("INSERT INTO todo_entries (id, summary, description) VALUES (?, ?, ?)");
                 try {
-                    statement.setLong(1, getNextId());
+                	if (null == id) {
+                		id = getNextId();
+                	}
+                    statement.setLong(1, id);
                     statement.setString(2, entry.getSummary());
                     statement.setString(3, entry.getDescription());
                     statement.executeUpdate();
+                    connection.commit();
                 } finally {
                     statement.close();
                 }
@@ -90,6 +102,9 @@ public class JdbcTodoListDAO implements TodoListDAO {
         } catch (SQLException e) {
             throw new DataAccessException("Could not save entry " + entry, e);
         }
+        
+        
+        return id;
     }
 
     private long getNextId() {
@@ -134,4 +149,59 @@ public class JdbcTodoListDAO implements TodoListDAO {
     private DataSource getDataSource() {
         return dataSource;
     }
+
+	@Override
+	public TodoEntry get(final Serializable idIn) {
+        try {
+            Connection connection = getConnection();
+            try {
+                Statement statement = connection.createStatement();
+                try {
+                    ResultSet rset = statement.executeQuery("SELECT * from todo_entries where id = " + idIn);
+                    try {
+                        TodoEntry te = null;
+                        if (rset.next()) {
+                            Long id = rset.getLong(1);
+                            String summary = rset.getString(2);
+                            String description = rset.getString(3);
+                            te = new TodoEntry(id, summary, description);
+                        }
+                        return te;
+                    } finally {
+                        rset.close();
+                    }
+                } finally {
+                    statement.close();
+                }
+            } finally {
+                connection.close();
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Could not get entry by idIn (" + idIn + "): ", e);
+        }
+        
+       
+	}
+
+	@Override
+	public int delete(Serializable idIn) {
+		try {
+			
+            Connection connection = getConnection();
+            try {
+                Statement statement = connection.createStatement();
+                try {
+                    return statement.executeUpdate("DELETE from todo_entries where id = " + idIn);
+                } finally {
+                    statement.close();
+                }
+            } finally {
+                connection.close();
+            }
+            
+        } catch (SQLException e) {
+            throw new DataAccessException("Could not delete entry by idIn (" + idIn + "): ", e);
+        }
+        		
+	}
 }

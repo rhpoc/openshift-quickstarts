@@ -41,7 +41,8 @@ public class MainServlet extends HttpServlet {
                     for (TodoEntry entry : todoListService.getAllEntries()) {
                         out.println(
                                 entryTemplate
-                                        .replace("{{ summary }}", escapeHtml(entry.getSummary()))
+                                		.replace("{{ id }}", escapeHtml(entry.getId().toString()))
+                                		.replace("{{ summary }}", escapeHtml(entry.getSummary()))
                                         .replace("{{ description }}", escapeHtml(entry.getDescription()))
                         );
                     }
